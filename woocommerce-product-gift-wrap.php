@@ -144,13 +144,14 @@ class WC_Product_Gift_Wrap {
 		global $post;
 		global $woocommerce;
 
+
 		if ( $this->is_wrappable($post->ID) == 'yes' ) {
 			if ($product_values['gift_wrap'] == 1) {
 				echo "<i class='icon-gift'></i> <p>Com embalagem para presente</p>
-					 <a href='".$woocommerce->cart->get_cart_url()."&product_key=".$cart_item_key."&gift_wrap_action=remove'>Clique para remover</a>";
+					 <a href='".add_query_arg( array('product_key' => $cart_item_key, 'gift_wrap_action' => 'remove' ), $woocommerce->cart->get_cart_url() )."'>Clique para remover</a>";
 			} else {
 				echo "<p>Sem embalagem para presente</p>
-					 <a href='".$woocommerce->cart->get_cart_url()."&product_key=".$cart_item_key."&gift_wrap_action=add'>Clique para adicionar</a>";
+					 <a href='".add_query_arg( array('product_key' => $cart_item_key, 'gift_wrap_action' => 'add' ), $woocommerce->cart->get_cart_url() )."'>Clique para adicionar</a>";
 			}
 		} else {
 			echo "Esse produto não pode ser embalado para presente";
