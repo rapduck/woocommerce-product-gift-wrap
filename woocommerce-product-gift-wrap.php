@@ -38,7 +38,7 @@ class WC_Product_Gift_Wrap {
 
 		$this->gift_wrap_enabled = get_option( 'product_gift_wrap_enabled' ) == 'yes' ? true : false;
 		$this->gift_wrap_cost    = get_option( 'product_gift_wrap_cost', 0 );
-		$this->product_gift_wrap_message = get_option( 'product_gift_wrap_message' );
+		// $this->product_gift_wrap_message = get_option( 'product_gift_wrap_message' );
 
 		if ( ! $this->product_gift_wrap_message )
 			$this->product_gift_wrap_message = $default_message;
@@ -72,7 +72,7 @@ class WC_Product_Gift_Wrap {
 		);
 
 		// Display on the front end
-		add_action( 'woocommerce_after_add_to_cart_button', array( $this, 'gift_option_html' ), 10 );
+		// add_action( 'woocommerce_after_add_to_cart_button', array( $this, 'gift_option_html' ), 10 );
 		add_action( 'petite_gift_wrap_column', array( $this, 'gift_wrap_column' ), 10, 2 );
 
 		// Filters for cart actions
@@ -98,7 +98,7 @@ class WC_Product_Gift_Wrap {
 	 * @param $post_id integer
 	 * @return string
 	 **/
-	function is_wrappable( $post_id )
+	public function is_wrappable( $post_id )
 	{
 		$is_wrappable = get_post_meta( $post_id, '_is_gift_wrappable', true );
 
@@ -113,7 +113,7 @@ class WC_Product_Gift_Wrap {
 	 *
 	 * @return string
 	 **/
-	function get_wrap_cost()
+	public function get_wrap_cost()
 	{
 		global $post;
 
@@ -124,7 +124,7 @@ class WC_Product_Gift_Wrap {
 
 		$price_text = $cost > 0 ? woocommerce_price( $cost ) : 'Embalagem Gratuita';
 
-		echo $price_text;
+		return $price_text;
 	}
 
 	/**
@@ -145,10 +145,10 @@ class WC_Product_Gift_Wrap {
 			if ( $cost == '' )
 				$cost = $this->gift_wrap_cost;
 
-			$price_text    = $cost > 0 ? woocommerce_price( $cost ) : __( 'free', 'product_gift_wrap' );
+			$price_text    = $cost > 0 ? 'por '.woocommerce_price( $cost ) : 'gratuitamente';
 			$checkbox      = '<input type="checkbox" name="gift_wrap" value="yes" ' . checked( $current_value, 1, false ).' />';
 
-			echo str_replace( array( '{checkbox}', '{price}' ), array( $checkbox, $price_text ), $this->product_gift_wrap_message );
+			echo '<p>'.$checkbox.' Embalar para presente '. $price_text .'?</p>';
 		}
 	}
 
@@ -166,11 +166,11 @@ class WC_Product_Gift_Wrap {
 
 		if ( $this->is_wrappable($post->ID) == 'yes' ) {
 			if ($product_values['gift_wrap'] == 1) {
-				echo "<i class='icon-gift'></i> <p>".$this->get_wrap_cost()."</p> <p>Com embalagem para presente</p>
-					 <a href='".add_query_arg( array('product_key' => $cart_item_key, 'gift_wrap_action' => 'remove' ), $woocommerce->cart->get_cart_url() )."'>Clique para remover</a>";
+				echo "<i class='icon-gift'></i> <p>".$this->get_wrap_cost()."</p>
+					 <p>Com embalagem<a href='".add_query_arg( array('product_key' => $cart_item_key, 'gift_wrap_action' => 'remove' ), $woocommerce->cart->get_cart_url() )."'> (Remover)</a></p>";
 			} else {
-				echo "<p>".woocommerce_price( 0 )."</p><p>Sem embalagem para presente</p>
-					 <a href='".add_query_arg( array('product_key' => $cart_item_key, 'gift_wrap_action' => 'add' ), $woocommerce->cart->get_cart_url() )."'>Clique para adicionar</a>";
+				echo "<p>Sem embalagem para presente</p>
+					  <a class='gift-wrap-add' href='".add_query_arg( array('product_key' => $cart_item_key, 'gift_wrap_action' => 'add' ), $woocommerce->cart->get_cart_url() )."'> (Adicionar)</a>";
 			}
 		} else {
 			echo "Esse produto não pode ser embalado para presente";
@@ -288,10 +288,9 @@ class WC_Product_Gift_Wrap {
 
 		if ( ! empty( $cart_item['gift_wrap'] ) )
 			$item_data[] = array(
-				'name'    => __( 'Gift Wrapped', 'product_gift_wrap' ),
+				'name'    => 'Para presente',
 				'value'   => __( 'Yes', 'product_gift_wrap' ),
-				'display' => __( 'Yes', 'product_gift_wrap' ),
-				'hidden'  => true	
+				'display' => 'Sim'
 			);
 
 		return $item_data;
