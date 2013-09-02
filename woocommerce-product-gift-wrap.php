@@ -211,14 +211,15 @@ class WC_Product_Gift_Wrap {
 
 			if ( $key == $_GET['product_key'] ) {
 
-				// Call the remove or add gift wrap function 
 				if ( $_GET['gift_wrap_action'] == "remove" ) {
 
 					$cart_item['gift_wrap'] = 0;
+					$cart_item['gift_message'] = '';
 
 				} elseif ( $_GET['gift_wrap_action'] == "add" ) {
 
 					$cart_item['gift_wrap'] = 1;
+					$cart_item['gift_message'] = htmlspecialchars($_POST['gift_message']);
 
 				}
 
@@ -243,11 +244,14 @@ class WC_Product_Gift_Wrap {
 	 */
 	public function get_cart_item_from_session( $cart_item, $values ) {
 
+		// First time add to cart (functionality not in use now)
 		if ( ! isset($cart_item['gift_wrap']) ) {
 
 			if ( isset( $values['gift_wrap'] ) ) {
 
 				$cart_item['gift_wrap'] = true;
+
+				$cart_item['gift_message'] = $values['gift_message'];
 
 				$cost = get_post_meta( $cart_item['data']->id, '_gift_wrap_cost', true );
 
@@ -258,10 +262,13 @@ class WC_Product_Gift_Wrap {
 			}
 
 		} else {
+			// Using the functionality in the cart page
 
 			if ( $cart_item['gift_wrap'] !== 0 ) {
 
 				$cart_item['gift_wrap'] = true;
+
+				$cart_item['gift_message'] = $cart_item['gift_message'];
 
 				$cost = get_post_meta( $cart_item['data']->id, '_gift_wrap_cost', true );
 
@@ -327,7 +334,8 @@ class WC_Product_Gift_Wrap {
 	 */
 	public function add_order_item_meta( $item_id, $cart_item ) {
 		if ( ! empty( $cart_item['gift_wrap'] ) )
-			woocommerce_add_order_item_meta( $item_id, __( 'Gift Wrapped', 'product_gift_wrap' ), __( 'Yes', 'product_gift_wrap' ) );
+			woocommerce_add_order_item_meta( $item_id, 'Para presente', 'Sim' );
+			woocommerce_add_order_item_meta( $item_id, 'Mensagem', $cart_item['gift_message'] );
 	}
 
 	/**
